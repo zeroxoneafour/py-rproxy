@@ -29,10 +29,9 @@ class MyProxy(BaseHTTPRequestHandler):
     def do_GET(self):
         if (gateway in self.path):
             gatewaypath = os.path.dirname(__file__) + '/' + gateway
-            url = gofetch.path_to_url(self.path[len(gateway)+1:])
-            gofetch.fetch_website(url, gateway, gatewaypath)
-            data = gofetch.read_website(url, gatewaypath)
-            mimetype = gofetch.get_mimetype(url, gatewaypath)
+            req = gofetch.path_to_req(self.path[len(gateway)+1:])
+            data = gofetch.fetch_website(req, gateway)
+            mimetype = gofetch.get_mimetype(req.url)
             self.send_response(200)
             self.send_header("Content-type", mimetype)
             self.end_headers()
