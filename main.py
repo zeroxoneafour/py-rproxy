@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import gofetch
 import mimetypes
 import os
+import shutil
 
 # default values
 port = 8080
@@ -71,3 +72,5 @@ except KeyboardInterrupt:
 
 server.server_close()
 print("Server stopped")
+print("Clearing gateway")
+shutil.rmtree(os.path.dirname(__file__) + '/' + gateway)

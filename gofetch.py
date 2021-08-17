@@ -38,24 +38,25 @@ def read_website(url, gatewaypath):
 
 # download a website without downloading website dependencies
 def download_website(url, gateway, gatewaypath):
-    if not (os.path.isdir(gatewaypath + url_to_path(url)) or os.path.isfile(gatewaypath + url_to_path(url))) or (".html" in url) or (url[-1] == '/'):
+    if not (os.path.isdir(gatewaypath + url_to_path(url)) or os.path.isfile(gatewaypath + url_to_path(url))):
         r = requests.get(url)
-        if (r.url[-1] == '/'):
-            mimetype = 'text/html'
-            os.makedirs(os.path.dirname(gatewaypath + url_to_path(r.url) + "index.html"), exist_ok=True)
-            filepath = gatewaypath + url_to_path(r.url) + 'index.html'
-        else:
-            mimetype = mimetypes.guess_type(url)
-            os.makedirs(os.path.dirname(gatewaypath + url_to_path(r.url)), exist_ok=True)
-            filepath = gatewaypath + url_to_path(r.url)
-        if not (os.path.isfile(filepath)):
-            f = open(filepath, 'x')
-            f.close()
-        print(filepath)
-        f = open(filepath, "wb")
-        content = r.content
-        f.write(content)
-        f.close
+        if not ".html" in r.url:
+            if (r.url[-1] == '/'):
+                mimetype = 'text/html'
+                os.makedirs(os.path.dirname(gatewaypath + url_to_path(r.url) + "index.html"), exist_ok=True)
+                filepath = gatewaypath + url_to_path(r.url) + 'index.html'
+            else:
+                mimetype = mimetypes.guess_type(url)
+                os.makedirs(os.path.dirname(gatewaypath + url_to_path(r.url)), exist_ok=True)
+                filepath = gatewaypath + url_to_path(r.url)
+            if not (os.path.isfile(filepath)):
+                f = open(filepath, 'x')
+                f.close()
+            print(filepath)
+            f = open(filepath, "wb")
+            content = r.content
+            f.write(content)
+            f.close
     return
 
 # handle various things like url swapping and dependency downloading
@@ -87,8 +88,7 @@ def fetch_website(url, gateway, gatewaypath):
     print(filepath)
     f = open(filepath, "wb")
     content = r.content
-    if ('text' in mimetype):
-        content = fix_page(content, r.url, gateway, gatewaypath)
+    content = fix_page(content, r.url, gateway, gatewaypath)
     f.write(content)
     f.close
     return
