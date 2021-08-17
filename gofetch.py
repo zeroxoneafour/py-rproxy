@@ -38,7 +38,7 @@ def read_website(url, gatewaypath):
 
 # download a website without downloading website dependencies
 def download_website(url, gateway, gatewaypath):
-    if not (os.path.isdir(gatewaypath + url_to_path(url)) or os.path.isfile(gatewaypath + url_to_path(url))) or (".html" in url) or (url[-1]='/'):
+    if not (os.path.isdir(gatewaypath + url_to_path(url)) or os.path.isfile(gatewaypath + url_to_path(url))) or (".html" in url) or (url[-1] == '/'):
         r = requests.get(url)
         if (r.url[-1] == '/'):
             mimetype = 'text/html'
