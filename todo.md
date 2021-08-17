@@ -3,5 +3,9 @@
 * website dependency fetching
 
 # things that are not working
+* logging into websites (probably because of post)
+* not filling the gateway with junk html we don't need
+
+# things I want to work
 * POST requests
 * changing `/` to `https://<domain>/` for websites that are weird and use that
