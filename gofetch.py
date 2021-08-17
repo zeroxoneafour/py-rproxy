@@ -18,9 +18,10 @@ def path_to_url(path):
 def path_to_req_post(path, post):
     r = requests.post("https:/" + path, data=post)
     if (r.status_code == 200):
-        return r.url
+        return r
     else:
         r = requests.post("http:/" + path, data=post)
+        return r
 
 def path_to_req(path):
     req = requests.get("https:/" + path)
