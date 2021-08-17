@@ -1,0 +1,5 @@
+port=8080
+# make sure to change this to your local ip
+hostname=localhost
+gateway=gateway
+webroot=server
