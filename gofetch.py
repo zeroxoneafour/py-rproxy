@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 import requests
 import concurrent.futures
 
+# local path to url
 def path_to_url(path):
     r = requests.get("https:/" + path)
     if (r.status_code == 200):
@@ -14,15 +15,18 @@ def path_to_url(path):
         r = requests.get("http:/" + path)
         return r.url
 
+# url to local path
 def url_to_path(url):
     return re.sub("https?:\/","",url)
 
+# get mimetype
 def get_mimetype(url, gatewaypath):
     if (os.path.isdir(gatewaypath + url_to_path(url))):
         return mimetypes.guess_type(gatewaypath + url_to_path(url))
     else:
         return mimetypes.guess_type(gatewaypath + url_to_path(url) + 'index.html')
 
+# read website at url from the local cache
 def read_website(url, gatewaypath):
     if (os.path.isdir(gatewaypath + url_to_path(url))):
         f = open(gatewaypath + url_to_path(url) + "index.html", "rb")
@@ -32,9 +36,10 @@ def read_website(url, gatewaypath):
     data = f.read()
     return data
 
+# download a website without downloading website dependencies
 def download_website(url, gateway, gatewaypath):
-    r = requests.get(url)
-    if not (os.path.isdir(gatewaypath + url_to_path(r.url)) or os.path.isfile(gatewaypath + url_to_path(r.url))):
+    if not (os.path.isdir(gatewaypath + url_to_path(url)) or os.path.isfile(gatewaypath + url_to_path(url))):
+        r = requests.get(url)
         if (r.url[-1] == '/'):
             mimetype = 'text/html'
             os.makedirs(os.path.dirname(gatewaypath + url_to_path(r.url) + "index.html"), exist_ok=True)
@@ -52,10 +57,12 @@ def download_website(url, gateway, gatewaypath):
         f.write(content)
         f.close
     return
-   
+
+# handle various things like url swapping and dependency downloading
 def fix_page(page, url, gateway, gatewaypath):
     page = page.decode("utf-8", "ignore")
     page = re.sub("\"\/", "\"https://" + urlparse(url).netloc + "/", page)
+    # multithreading? idk
     with concurrent.futures.ThreadPoolExecutor() as executor:
         response_process = []
         for url in re.findall("\"https?:\/\/[^\"]*", page):
@@ -63,6 +70,7 @@ def fix_page(page, url, gateway, gatewaypath):
     page = re.sub("\"https?:\/", "\"/" + gateway, page)
     return page.encode("utf-8", "ignore")
 
+# main fetch website script that downloads a website and resolved dependencies
 def fetch_website(url, gateway, gatewaypath):
     r = requests.get(url)
     if (r.url[-1] == '/'):
@@ -85,6 +93,7 @@ def fetch_website(url, gateway, gatewaypath):
     f.close
     return
 
+# idk, probably for post?
 def read_post(path, data):
     url = get_url(path)
     post = requests.post(url, data)
