@@ -8,4 +8,3 @@
 
 # things I want to work
 * POST requests
-* changing `/` to `https://<domain>/` for websites that are weird and use that
