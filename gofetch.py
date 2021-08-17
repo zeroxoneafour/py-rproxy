@@ -50,7 +50,7 @@ def fix_page(page, url, gateway):
 # main fetch website script that downloads a website and resolved dependencies
 def fetch_website(req, gateway):
     content = req.content
-    mimetype = mimetypes.guess_type(req.url)[0]
-    if (mimetype is None) or (mimetype.find("text") != -1):
+    mimetype = get_mimetype(req.url)
+    if (mimetype is None) or (mimetype.find("text/html") != -1):
         content = fix_page(content, req.url, gateway)
     return content

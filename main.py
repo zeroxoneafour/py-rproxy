@@ -32,7 +32,7 @@ class MyProxy(BaseHTTPRequestHandler):
             data = gofetch.fetch_website(req, gateway)
             mimetype = gofetch.get_mimetype(req.url)
             self.send_response(200)
-            self.send_header("Content-type", mimetype)
+            self.send_header("Content-Type", mimetype)
             self.end_headers()
             self.wfile.write(data)
         else:
@@ -40,7 +40,7 @@ class MyProxy(BaseHTTPRequestHandler):
             if (os.path.isdir(webroot_path + self.path)):
                 file = open(webroot_path + self.path + "/index.html")
                 self.send_response(200)
-                self.send_header("Content-type", mimetypes.guess_type(self.path))
+                self.send_header("Content-Type", mimetypes.guess_type(self.path))
                 self.end_headers()
                 file_data = file.read()
                 file.close()
@@ -49,7 +49,7 @@ class MyProxy(BaseHTTPRequestHandler):
             elif (os.path.isfile(webroot_path + self.path)):
                 file = open(webroot_path + self.path)
                 self.send_response(200)
-                self.send_header("Content-type", mimetypes.guess_type(self.path))
+                self.send_header("Content-Type", mimetypes.guess_type(self.path))
                 self.end_headers()
                 file_data = file.read()
                 file.close()
@@ -57,7 +57,7 @@ class MyProxy(BaseHTTPRequestHandler):
                 self.wfile.write(file_data)
             else:
                 self.send_response(404)
-                self.send_header("Content-type", 'index/html')
+                self.send_header("Content-Type", 'index/html')
                 self.end_headers()
 
     def do_POST(self):
@@ -68,7 +68,7 @@ class MyProxy(BaseHTTPRequestHandler):
             data = gofetch.fetch_website(req, gateway)
             mimetype = gofetch.get_mimetype(req.url)
             self.send_response(200)
-            self.send_header("Content-type", mimetype)
+            self.send_header("Content-Type", mimetype)
             self.end_headers()
             self.wfile.write(data)
 
