@@ -1,8 +1,7 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import gofetch
-import mimetypes
 import os
-import shutil
+import mimetypes
 
 # default values
 port = 8080
@@ -37,29 +36,43 @@ class MyProxy(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
         else:
-            self.send_response(200)
-            self.send_header("Content-type", mimetypes.guess_type(self.path))
-            self.end_headers()
             webroot_path = os.path.dirname(__file__) + '/' + webroot
             if (os.path.isdir(webroot_path + self.path)):
                 file = open(webroot_path + self.path + "/index.html")
-            else:
+                self.send_response(200)
+                self.send_header("Content-type", mimetypes.guess_type(self.path))
+                self.end_headers()
+                file_data = file.read()
+                file.close()
+                file_data = file_data.encode("utf-8")
+                self.wfile.write(file_data)
+            elif (os.path.isfile(webroot_path + self.path)):
                 file = open(webroot_path + self.path)
-            file_data = file.read()
-            file.close()
-            file_data = file_data.encode("utf-8")
-            self.wfile.write(file_data)
+                self.send_response(200)
+                self.send_header("Content-type", mimetypes.guess_type(self.path))
+                self.end_headers()
+                file_data = file.read()
+                file.close()
+                file_data = file_data.encode("utf-8")
+                self.wfile.write(file_data)
+            else:
+                self.send_response(404)
+                self.send_header("Content-type", 'index/html')
+                self.end_headers()
 
     def do_POST(self):
-        content_length = int(self.headers["Content-Length"])
-        data = self.rfile.read(content_length)
-        self.send_response(200)
-        self.send_header("Content-type", mimetypes.guess_type(self.path))
-        self.end_headers()
-        if ( gateway in self.path):
-            self.wfile.write(read_post(self.path, data))
+        if (gateway in self.path):
+            content_length = int(self.headers["Content-length"])
+            post = self.rfile.read(content_length)
+            req = gofetch.path_to_req_post(self.path[len(gateway)+1:], post)
+            data = gofetch.fetch_website(req, gateway)
+            mimetype = gofetch.get_mimetype(req.url)
+            self.send_response(200)
+            self.send_header("Content-type", mimetype)
+            self.end_headers()
+            self.wfile.write(data)
 
-server = HTTPServer((hostname, int(port)), MyProxy)
+server = ThreadingHTTPServer((hostname, int(port)), MyProxy)
 print("Server started on http://%s:%s" % (hostname, port))
 print("Gateway: %s" % (gateway))
 print("Web root: %s" % (webroot))

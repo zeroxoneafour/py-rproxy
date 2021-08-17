@@ -15,6 +15,13 @@ def path_to_url(path):
         r = requests.get("http:/" + path)
         return r.url
 
+def path_to_req_post(path, post):
+    r = requests.post("https:/" + path, data=post)
+    if (r.status_code == 200):
+        return r.url
+    else:
+        r = requests.post("http:/" + path, data=post)
+
 def path_to_req(path):
     req = requests.get("https:/" + path)
     if (req.status_code == 200):
@@ -35,7 +42,7 @@ def get_mimetype(url):
 def fix_page(page, url, gateway):
     page = page.decode("utf-8", "ignore")
     page = re.sub("\"\/", "\"https://" + urlparse(url).netloc + "/", page)
-    # no more multithreading :(
+    # multithreading now in server
     page = re.sub("\"https?:\/", "\"/" + gateway, page)
     return page.encode("utf-8", "ignore")
 
@@ -46,11 +53,3 @@ def fetch_website(req, gateway):
     if (mimetype is None) or (mimetype.find("text") != -1):
         content = fix_page(content, req.url, gateway)
     return content
-
-# idk, probably for post?
-def read_post(path, data):
-    url = get_url(path)
-    post = requests.post(url, data)
-    post = post.text
-    post = fix_page(post, url)
-    return post.encode("utf-8", "ignore")
