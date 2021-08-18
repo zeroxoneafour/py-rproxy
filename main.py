@@ -61,6 +61,7 @@ class MyProxy(BaseHTTPRequestHandler):
             self.wfile.write(read_post(self.path, data))
 
 server = HTTPServer((hostname, int(port)), MyProxy)
+print("py-rproxy - Gateway")
 print("Server started on http://%s:%s" % (hostname, port))
 print("Gateway: %s" % (gateway))
 print("Web root: %s" % (webroot))
