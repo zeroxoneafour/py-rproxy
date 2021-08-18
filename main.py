@@ -72,7 +72,7 @@ class MyProxy(BaseHTTPRequestHandler):
             content_length = int(self.headers["Content-Length"])
             post = self.rfile.read(content_length) # read post
             req = gofetch.path_to_req_post(self.path[len(gateway)+1:], post) # exclude gateway from path
-            data = gofetch.fetch_post(req)
+            data = gofetch.fetch_post(req, gateway)
             mimetype = gofetch.get_mimetype(req.url)
             self.send_response(200)
             self.send_header("Content-Type", mimetype)

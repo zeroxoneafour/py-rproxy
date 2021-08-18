@@ -47,7 +47,7 @@ def fix_page(page, url, gateway):
     page = re.sub("\"https?:\/", "\"/" + gateway, page)
     return page.encode("utf-8", "ignore")
 
-# main fetch website script that downloads a website and returns content
+# main fetch website script that downloads a website and returns content. Also might work with post
 def fetch_website(req, gateway):
     content = req.content
     mimetype = get_mimetype(req.url)
@@ -55,6 +55,10 @@ def fetch_website(req, gateway):
         content = fix_page(content, req.url, gateway)
     return content
 
-# fetch post
-def fetch_post(req):
-    return req.text
+# fetch post - look similar?
+def fetch_post(req, gateway):
+    content = req.content
+    mimetype = get_mimetype(req.url)
+    if (mimetype is None) or (mimetype.find("text/html") != -1):
+        content = fix_page(content, req.url, gateway)
+    return content
