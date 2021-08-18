@@ -54,3 +54,6 @@ def fetch_website(req, gateway):
     if (mimetype is None) or (mimetype.find("text/html") != -1):
         content = fix_page(content, req.url, gateway)
     return content
+
+def fetch_post(req):
+    return req.text

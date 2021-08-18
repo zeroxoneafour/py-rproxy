@@ -65,7 +65,7 @@ class MyProxy(BaseHTTPRequestHandler):
             content_length = int(self.headers["Content-length"])
             post = self.rfile.read(content_length)
             req = gofetch.path_to_req_post(self.path[len(gateway)+1:], post)
-            data = gofetch.fetch_website(req, gateway)
+            data = gofetch.fetch_post(req)
             mimetype = gofetch.get_mimetype(req.url)
             self.send_response(200)
             self.send_header("Content-Type", mimetype)
@@ -84,5 +84,3 @@ except KeyboardInterrupt:
 
 server.server_close()
 print("Server stopped")
-print("Clearing gateway")
-shutil.rmtree(os.path.dirname(__file__) + '/' + gateway)
