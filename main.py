@@ -3,6 +3,9 @@ import gofetch
 import os
 import mimetypes
 
+# version
+version="0.0.1"
+
 # default values
 port = 8080
 hostname = "localhost"
@@ -73,6 +76,7 @@ class MyProxy(BaseHTTPRequestHandler):
             self.wfile.write(data)
 
 server = ThreadingHTTPServer((hostname, int(port)), MyProxy)
+print("py-rproxy v" + version)
 print("Server started on http://%s:%s" % (hostname, port))
 print("Gateway: %s" % (gateway))
 print("Web root: %s" % (webroot))
