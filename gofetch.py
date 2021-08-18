@@ -1,10 +1,7 @@
 import re
 import mimetypes
-import os
-import urllib
 from urllib.parse import urlparse
 import requests
-import concurrent.futures
 
 # local path to url
 def path_to_url(path):
@@ -15,6 +12,7 @@ def path_to_url(path):
         r = requests.get("http:/" + path)
         return r.url
 
+# local path to post request
 def path_to_req_post(path, post):
     r = requests.post("https:/" + path, data=post)
     if (r.status_code == 200):
@@ -23,6 +21,7 @@ def path_to_req_post(path, post):
         r = requests.post("http:/" + path, data=post)
         return r
 
+# local path to get request
 def path_to_req(path):
     req = requests.get("https:/" + path)
     if (req.status_code == 200):
@@ -42,12 +41,13 @@ def get_mimetype(url):
 # handle various things like url swapping and dependency downloading
 def fix_page(page, url, gateway):
     page = page.decode("utf-8", "ignore")
+    # still, somehow, doesn't really work
     page = re.sub("\"\/", "\"https://" + urlparse(url).netloc + "/", page)
     # multithreading now in server
     page = re.sub("\"https?:\/", "\"/" + gateway, page)
     return page.encode("utf-8", "ignore")
 
-# main fetch website script that downloads a website and resolved dependencies
+# main fetch website script that downloads a website and returns content
 def fetch_website(req, gateway):
     content = req.content
     mimetype = get_mimetype(req.url)
@@ -55,5 +55,6 @@ def fetch_website(req, gateway):
         content = fix_page(content, req.url, gateway)
     return content
 
+# fetch post
 def fetch_post(req):
     return req.text
