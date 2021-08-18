@@ -42,16 +42,16 @@ def get_mimetype(url):
 def fix_page(page, url, gateway):
     page = page.decode("utf-8", "ignore")
     # still, somehow, doesn't really work
-    page = re.sub("\"\/", "\"https://" + urlparse(url).netloc + "/", page)
+    page = re.sub("\"\/", "\"/" + gateway + "/" + urlparse(url).netloc + "/", page)
     # multithreading now in server
-    page = re.sub("\"https?:\/", "\"/" + gateway, page)
+    page = re.sub("https?:\/", "/" + gateway, page)
     return page.encode("utf-8", "ignore")
 
 # main fetch website script that downloads a website and returns content. Also might work with post
 def fetch_website(req, gateway):
     content = req.content
     mimetype = get_mimetype(req.url)
-    if (mimetype is None) or (mimetype.find("text/html") != -1):
+    if (mimetype is None) or (mimetype.find("text/html") != -1) or (mimetype.find("application/javascript") != -1) or (mimetype.find("text/php") != -1):
         content = fix_page(content, req.url, gateway)
     return content
 

@@ -40,7 +40,6 @@ class MyProxy(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", mimetype)
             self.end_headers()
-            self.wfile.write(data)
         else: # normal web server with root __file__/webroot
             webroot_path = os.path.dirname(__file__) + '/' + webroot
             if (os.path.isdir(webroot_path + self.path)): # load directory
@@ -50,8 +49,7 @@ class MyProxy(BaseHTTPRequestHandler):
                 self.end_headers()
                 file_data = file.read()
                 file.close()
-                file_data = file_data.encode("utf-8")
-                self.wfile.write(file_data)
+                data = file_data.encode("utf-8")
             elif (os.path.isfile(webroot_path + self.path)): # load file
                 file = open(webroot_path + self.path)
                 self.send_response(200)
@@ -59,25 +57,40 @@ class MyProxy(BaseHTTPRequestHandler):
                 self.end_headers()
                 file_data = file.read()
                 file.close()
-                file_data = file_data.encode("utf-8")
-                self.wfile.write(file_data)
+                data = file_data.encode("utf-8")
             else: # 404 handler
                 self.send_response(404)
                 self.send_header("Content-Type", 'index/html')
                 self.end_headers()
+                data = "<!doctype html><html><head><title>404</title></head><body><h1>404</h1><body></html>".encode("utf-8")
+
+        # serve file
+
+        while True:
+            try:
+                self.wfile.write(data)
+            except BrokenPipeError:
+                continue
+            break
 
     # post request
     def do_POST(self):
         if (gateway in self.path):
             content_length = int(self.headers["Content-Length"])
             post = self.rfile.read(content_length) # read post
+            print(post)
             req = gofetch.path_to_req_post(self.path[len(gateway)+1:], post) # exclude gateway from path
             data = gofetch.fetch_post(req, gateway)
             mimetype = gofetch.get_mimetype(req.url)
             self.send_response(200)
             self.send_header("Content-Type", mimetype)
             self.end_headers()
-            self.wfile.write(data)
+            while True:
+                try:
+                    self.wfile.write(data)
+                except BrokenPipeError:
+                    continue
+                break
 
 server = ThreadingHTTPServer((hostname, int(port)), MyProxy)
 print("py-rproxy v" + version)
